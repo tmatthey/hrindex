@@ -1,0 +1,36 @@
+<resources>
+
+<properties>
+    <property id="appVersion" type="string">1.0.0</property>
+    <property id="shr" type="number">70</property>
+    <property id="avgTime" type="number">15</property>
+</properties>
+
+	<strings>
+		<string id="AppVersionTitle">Heart Rate Index</string>
+		<string id="SHRLabel">Standing Heart Rate [HRB]</string>
+		<string id="SHRPrompt">Enter standing heart rate, ca. rest heart
+		rate - 12</string>
+		<string id="SHRError">HRB shall be 30 - 200.</string>
+		<string id="AvgTimeLabel">Average time [s]</string>
+		<string id="AvgTimeError">Average time shall be 1-600[s]</string>
+	</strings>
+
+<settings>
+
+    <setting propertyKey="@Properties.appVersion" title="@Strings.AppVersionTitle">
+        <settingConfig type="alphaNumeric" readonly="true" />
+    </setting>
+
+    <setting propertyKey="@Properties.shr" title="@Strings.SHRLabel" prompt="@Strings.SHRPrompt">
+        <settingConfig type="numeric" errorMessage="@Strings.SHRError" min="30" max="200"/>
+    </setting>
+    <setting propertyKey="@Properties.avgTime" title="@Strings.AvgTimeLabel" >
+        <settingConfig type="numeric" errorMessage="@Strings.AvgTimeError" min="1" max="600"/>
+    </setting>
+
+</settings>
+
+
+
+</resources>
