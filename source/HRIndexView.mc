@@ -39,8 +39,7 @@ class HRIndexView extends Ui.SimpleDataField {
     hidden var _arraySHR;
     hidden var _arrayTime;
     hidden var _arrayDist;
-    hidden var _arrayAscent;
-    hidden var _arrayDescent;
+    hidden var _arrayAlt;
     hidden var _sumSHR;
     hidden var _sumTime;
     hidden var _lastTime;
@@ -67,9 +66,8 @@ class HRIndexView extends Ui.SimpleDataField {
  
         _arraySHR = new [0];
         _arrayTime = new [0];
-        _arrayDist = [0.0];
-        _arrayAscent = [0.0];
-        _arrayDescent = [0.0];
+        _arrayDist = new [0];
+        _arrayAlt = new [0];
         _sumSHR = 0.0f;
         _sumTime = 0.0f;
         _lastTime = 0.0f;
@@ -91,15 +89,25 @@ class HRIndexView extends Ui.SimpleDataField {
                 if (_lastHRI < 0.0 || _lastTime <= 0.0){
                     _lastHRI =  hri;
                 }
+                
+                var act = Toybox.Activity.getActivityInfo();
+                var altitude = null;
+                var dist = null;                
+                if (info has :elapsedDistance && act has :altitude ){
+                	if (info.elapsedDistance != null && act.altitude != null){
+                		altitude = act.altitude;
+                		dist = info.elapsedDistance;
+                	}
+                }
+                if (altitude != null && _arrayDist.size() == 0){
+                    _arrayDist.add(dist);
+                    _arrayAlt.add(altitude);
+                }
 				
                 if (_lastTime < time){
-                    
-                    if (info has :elapsedDistance && info has :totalAscent && info has :totalDescent ){
-                        if (info.elapsedDistance != null && info.totalAscent != null&& info.totalDescent != null){
-                            _arrayDist.add(info.elapsedDistance);
-                            _arrayAscent.add(info.totalAscent);
-                            _arrayDescent.add(info.totalDescent);
-                        }
+                    if (altitude != null){
+                        _arrayDist.add(dist);
+                        _arrayAlt.add(altitude);
                     }
                     
                     var dt = time-_lastTime; 
@@ -108,8 +116,7 @@ class HRIndexView extends Ui.SimpleDataField {
                     _sumSHR += hri*dt;
                     _sumTime += dt;
                     
-                    while (_sumTime > _avgTime && _arraySHR.size() > 1){
-                        
+                    while (_sumTime > _avgTime && _arraySHR.size() > 1){                       
                         _sumSHR -= _arraySHR[0];
                         _arraySHR = _arraySHR.slice(1, _arraySHR.size());
                         _sumTime -= _arrayTime[0];
@@ -118,15 +125,14 @@ class HRIndexView extends Ui.SimpleDataField {
                     
                     while (_arrayDist.size() > 2 && _arrayDist[_arrayDist.size()-1] -_arrayDist[1] > _avgDist){						
                         _arrayDist = _arrayDist.slice(1, _arrayDist.size());
-                        _arrayAscent = _arrayAscent.slice(1, _arrayAscent.size());
-                        _arrayDescent = _arrayDescent.slice(1, _arrayDescent.size());
+                        _arrayAlt = _arrayAlt.slice(1, _arrayAlt.size());
                     }
 
                     var f = 1.0;
                     if (_elevMode > 0){
                         if (_arrayDist.size() > 1){
                             var dist = _arrayDist[_arrayDist.size()-1] - _arrayDist[0];
-                            var elev = _arrayAscent[_arrayAscent.size()-1] - _arrayAscent[0] - (_arrayDescent[_arrayDescent.size()-1] - _arrayDescent[0]);
+                            var elev = _arrayAlt[_arrayAlt.size()-1] - _arrayAlt[0];
                             if (dist > 1.0){
                                 if (_elevMode == 2){
                                     if (dist > 0.75 * _avgDist){
