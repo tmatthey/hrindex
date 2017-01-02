@@ -1,9 +1,11 @@
 <resources>
 
 <properties>
-    <property id="appVersion" type="string">1.0.0</property>
-    <property id="shr" type="number">70</property>
+    <property id="appVersion" type="string">1.1.0</property>
+    <property id="shr" type="number">60</property>
     <property id="avgTime" type="number">15</property>
+    <property id="avgDist" type="number">50</property>
+    <property id="elevMode" type="number">2</property>
 </properties>
 
 	<strings>
@@ -12,8 +14,15 @@
 		<string id="SHRPrompt">Enter standing heart rate, ca. rest heart
 		rate - 12</string>
 		<string id="SHRError">HRB shall be 30 - 200.</string>
-		<string id="AvgTimeLabel">Average time [s]</string>
-		<string id="AvgTimeError">Average time shall be 1-600[s]</string>
+		<string id="AvgTimeLabel">Averaging time [s]</string>
+		<string id="AvgTimeError">Averaging time shall be 1-600[s]</string>
+		<string id="AvgDistLabel">Averaging distance for gradient [m]</string>
+		<string id="AvgDistError">Averaging distance shall be 1-1000[m]</string>
+		<string id="ElevModeLabel">Elevation model</string>
+		<string id="ElevModePrompt">Model to account uphill and downhill. Grade Adjusted Pace (GAP) estimates the equivalent flat land pace for a given running pace on hilly terrain.</string>
+		<string id="ElevNone">None</string>
+		<string id="Elev6">Constant 6x uphill</string>
+		<string id="ElevMinetti">GAP: Minetti et. al.</string>
 	</strings>
 
 <settings>
@@ -25,8 +34,21 @@
     <setting propertyKey="@Properties.shr" title="@Strings.SHRLabel" prompt="@Strings.SHRPrompt">
         <settingConfig type="numeric" errorMessage="@Strings.SHRError" min="30" max="200"/>
     </setting>
+
     <setting propertyKey="@Properties.avgTime" title="@Strings.AvgTimeLabel" >
         <settingConfig type="numeric" errorMessage="@Strings.AvgTimeError" min="1" max="600"/>
+    </setting>
+    
+    <setting propertyKey="@Properties.avgDist" title="@Strings.AvgDistLabel" >
+        <settingConfig type="numeric" errorMessage="@Strings.AvgDistError" min="1" max="1000"/>
+    </setting>
+
+    <setting propertyKey="@Properties.elevMode" title="@Strings.ElevModeLabel" prompt="@Strings.ElevModePrompt">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.ElevNone</listEntry>
+            <listEntry value="1">@Strings.Elev6</listEntry>
+            <listEntry value="2">@Strings.ElevMinetti</listEntry>
+        </settingConfig>
     </setting>
 
 </settings>

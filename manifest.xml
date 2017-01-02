@@ -2,11 +2,7 @@
     <iq:application entry="HRIndexApp" id="D35CBF19EF46473295657A44DB7A3179" launcherIcon="@Drawables.LauncherIcon" minSdkVersion="1.2.0" name="@Strings.AppName" type="datafield">
 
         <iq:products>
-            <iq:product id="square_watch"/>
-            <iq:product id="tall_watch"/>
-            <iq:product id="round_watch"/>
             <iq:product id="round-240x240"/>
-            <iq:product id="semi_round_watch"/>
             <iq:product id="fr630"/>
             <iq:product id="fr235"/>
             <iq:product id="fr735xt"/>
@@ -27,8 +23,7 @@
             <iq:product id="rino7xx"/>
         </iq:products>
 
-        <iq:permissions>
-        </iq:permissions>
+        <iq:permissions/>
 
 
         <iq:languages/>
