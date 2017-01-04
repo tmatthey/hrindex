@@ -5,3 +5,5 @@
 A heart rate-running speed index calculator over given (average) time span. 
 Ref: "Heart Rate - Running Speed–index May Be an Efficient Method of
 Monitoring Endurance Training Adaptation" (https://www.ncbi.nlm.nih.gov/pubmed/24345970).
+
+![fr630.png](https://bitbucket.org/repo/AxryR9/images/1046818902-fr630.png)
