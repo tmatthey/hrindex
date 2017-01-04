@@ -36,15 +36,21 @@ class HRIndexView extends Ui.SimpleDataField {
     hidden var _avgDist;
     hidden var _elevMode;
 
-    hidden var _arraySHR;
     hidden var _arrayTime;
+    hidden var _arraySpeed;
     hidden var _arrayDist;
     hidden var _arrayAlt;
-    hidden var _sumSHR;
+    hidden var _sumSpeed;
     hidden var _sumTime;
     hidden var _lastTime;
     hidden var _lastHRI;
     hidden var _minettiZero;
+    hidden var _minettiMinX;
+    hidden var _minettiMinA;
+    hidden var _minettiMinB;
+    hidden var _minettiMaxX;
+    hidden var _minettiMaxA;
+    hidden var _minettiMaxB;
 
     function initialize() {
         SimpleDataField.initialize();
@@ -64,30 +70,39 @@ class HRIndexView extends Ui.SimpleDataField {
  
         label = "HR Index" +" " + _SHR.format("%.0f") +"/"+ _avgTime.format("%.0f") + e;
  
-        _arraySHR = new [0];
         _arrayTime = new [0];
+        _arraySpeed = new [0];
         _arrayDist = new [0];
         _arrayAlt = new [0];
-        _sumSHR = 0.0f;
+        _sumSpeed = 0.0f;
         _sumTime = 0.0f;
         _lastTime = 0.0f;
         _lastHRI = -1.0f;		
         _minettiZero = minetti(0.0);
+    	_minettiMinX = -0.45f;
+      	_minettiMinA = minettiDiv(_minettiMinX);
+      	_minettiMinB = minetti(_minettiMinX);
+      	_minettiMaxX = 0.45f;
+      	_minettiMaxA = minettiDiv(_minettiMaxX);
+      	_minettiMaxB = minetti(_minettiMaxX);
     }
 
     function compute(info) { 
         if(info has :currentHeartRate && info has :currentSpeed){
             if(info.currentHeartRate != null && info.currentSpeed != null && 
                info.currentHeartRate > _SHR && info.currentSpeed > 0.3f){
+                
+                var v = info.currentSpeed;
+                var hr = info.currentHeartRate - _SHR; 
                 var time = info.elapsedTime;
                 if (time != null) {
                     time /= 1000;
                 } else {
                     time = 0.0;
                 }
-                var hri = ((info.currentHeartRate - _SHR) / info.currentSpeed);
+                
                 if (_lastHRI < 0.0 || _lastTime <= 0.0){
-                    _lastHRI =  hri;
+                    _lastHRI =  hr / v;
                 }
                 
                 var act = Toybox.Activity.getActivityInfo();
@@ -111,16 +126,15 @@ class HRIndexView extends Ui.SimpleDataField {
                     }
                     
                     var dt = time-_lastTime; 
-                    _arraySHR.add(hri*dt);
-                    _arrayTime.add(dt);
-                    _sumSHR += hri*dt;
+                    _sumSpeed += v*dt;
+                    _arraySpeed.add(v*dt);
                     _sumTime += dt;
-                    
-                    while (_sumTime > _avgTime && _arraySHR.size() > 1){                       
-                        _sumSHR -= _arraySHR[0];
-                        _arraySHR = _arraySHR.slice(1, _arraySHR.size());
+                    _arrayTime.add(dt);
+                    while (_sumTime > _avgTime && _arrayTime.size() > 1){                       
                         _sumTime -= _arrayTime[0];
                         _arrayTime = _arrayTime.slice(1, _arrayTime.size());
+                        _sumSpeed -= _arraySpeed[0];
+                        _arraySpeed = _arraySpeed.slice(1, _arraySpeed.size());
                     }
                     
                     while (_arrayDist.size() > 2 && _arrayDist[_arrayDist.size()-1] -_arrayDist[1] > _avgDist){						
@@ -135,8 +149,8 @@ class HRIndexView extends Ui.SimpleDataField {
                             var elev = _arrayAlt[_arrayAlt.size()-1] - _arrayAlt[0];
                             if (dist > 1.0){
                                 if (_elevMode == 2){
-                                    if (dist > 0.75 * _avgDist){
-                                        f = minetti(elev/dist)/_minettiZero;
+                                    if (dist > 0.5 * _avgDist){
+                                        f = minettiBounded(elev/dist)/_minettiZero;
                                     }		
                                 }
                                 else if (elev > 0){
@@ -147,7 +161,7 @@ class HRIndexView extends Ui.SimpleDataField {
                     }
 										
                     _lastTime =  time;
-                    _lastHRI = _sumSHR / _sumTime / f;
+                    _lastHRI = hr / (_sumSpeed / _sumTime) / f;
                 }
 								
                	return  _lastHRI.format("%.0f");                
@@ -156,8 +170,22 @@ class HRIndexView extends Ui.SimpleDataField {
         return "-";
     }
     
+    function minettiBounded(g){
+    	if (g <= _minettiMinX){
+    		return _minettiMinA * (g - _minettiMinX) + _minettiMinB;
+    	}
+    	if (_minettiMaxX <= g){
+    		return _minettiMaxA * (g - _minettiMaxX) + _minettiMaxB;
+    	}
+        return minetti(g);
+    }
+    
     function minetti(g){
         return 106.7731478*g*g*g*g*g - 47.23550515*g*g*g*g - 33.40634794*g*g*g + 49.35038999*g*g + 19.12318478*g + 3.389064903;
         // return 155.4*g*g*g*g*g - 30.4*g*g*g*g - 43.3*g*g*g + 46.3*g*g + 19.5*g + 3.6;
+    }
+    
+    function minettiDiv(g){
+        return 106.7731478*g*g*g*g*5.0 - 47.23550515*g*g*g*4.0 - 33.40634794*g*g*3.0 + 49.35038999*g*2.0 + 19.12318478;
     }
 }

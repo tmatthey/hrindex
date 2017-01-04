@@ -1,10 +1,10 @@
 <resources>
 
 <properties>
-    <property id="appVersion" type="string">1.1.2</property>
+    <property id="appVersion" type="string">1.1.3</property>
     <property id="shr" type="number">60</property>
-    <property id="avgTime" type="number">15</property>
-    <property id="avgDist" type="number">50</property>
+    <property id="avgTime" type="number">20</property>
+    <property id="avgDist" type="number">75</property>
     <property id="elevMode" type="number">2</property>
 </properties>
 
@@ -14,7 +14,7 @@
 		<string id="SHRPrompt">Enter standing heart rate, ca. rest heart
 		rate - 12</string>
 		<string id="SHRError">HRB shall be 30 - 200.</string>
-		<string id="AvgTimeLabel">Averaging time [s]</string>
+		<string id="AvgTimeLabel">Averaging time of pace [s]</string>
 		<string id="AvgTimeError">Averaging time shall be 1-600[s]</string>
 		<string id="AvgDistLabel">Averaging distance for gradient [m]</string>
 		<string id="AvgDistError">Averaging distance shall be 1-1000[m]</string>
