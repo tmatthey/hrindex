@@ -28,6 +28,7 @@
 
 
 using Toybox.WatchUi as Ui;
+using Toybox.FitContributor as Fit;
 
 class HRIndexView extends Ui.SimpleDataField {
 
@@ -51,6 +52,7 @@ class HRIndexView extends Ui.SimpleDataField {
     hidden var _minettiMaxX;
     hidden var _minettiMaxA;
     hidden var _minettiMaxB;
+	hidden var _fitHri;
 
     function initialize() {
         SimpleDataField.initialize();
@@ -85,6 +87,8 @@ class HRIndexView extends Ui.SimpleDataField {
       	_minettiMaxX = 0.45f;
       	_minettiMaxA = minettiDiv(_minettiMaxX);
       	_minettiMaxB = minetti(_minettiMaxX);
+        _fitHri = createField("hrIndex", 0, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD });
+        _fitHri.setData(0.0);
     }
 
     function compute(info) { 
@@ -163,7 +167,8 @@ class HRIndexView extends Ui.SimpleDataField {
                     _lastTime =  time;
                     _lastHRI = hr / (_sumSpeed / _sumTime) / f;
                 }
-								
+                
+		        _fitHri.setData(_lastHRI);				
                	return  _lastHRI.format("%.0f");                
             } 
         }
