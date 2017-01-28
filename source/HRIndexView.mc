@@ -41,6 +41,7 @@ class HRIndexView extends Ui.SimpleDataField {
     hidden var _arraySpeed;
     hidden var _arrayDist;
     hidden var _arrayAlt;
+    hidden var _arrayGrad;
     hidden var _sumSpeed;
     hidden var _sumTime;
     hidden var _lastTime;
@@ -53,6 +54,7 @@ class HRIndexView extends Ui.SimpleDataField {
     hidden var _minettiMaxA;
     hidden var _minettiMaxB;
 	hidden var _fitHri;
+	hidden var _fitGrad;
 
     function initialize() {
         SimpleDataField.initialize();
@@ -76,6 +78,7 @@ class HRIndexView extends Ui.SimpleDataField {
         _arraySpeed = new [0];
         _arrayDist = new [0];
         _arrayAlt = new [0];
+        _arrayGrad = new [0];
         _sumSpeed = 0.0f;
         _sumTime = 0.0f;
         _lastTime = 0.0f;
@@ -88,7 +91,7 @@ class HRIndexView extends Ui.SimpleDataField {
       	_minettiMaxA = minettiDiv(_minettiMaxX);
       	_minettiMaxB = minetti(_minettiMaxX);
         _fitHri = createField("hrIndex", 0, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD });
-        _fitHri.setData(0.0);
+        _fitGrad = createField("gradient", 1, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD , :units=>"m/m"});
     }
 
     function compute(info) { 
@@ -98,7 +101,7 @@ class HRIndexView extends Ui.SimpleDataField {
                 
                 var v = info.currentSpeed;
                 var hr = info.currentHeartRate - _SHR; 
-                var time = info.elapsedTime;
+                var time = info.timerTime;
                 if (time != null) {
                     time /= 1000;
                 } else {
@@ -123,11 +126,8 @@ class HRIndexView extends Ui.SimpleDataField {
                     _arrayAlt.add(altitude);
                 }
 				
+                var grad = 0.0;
                 if (_lastTime < time){
-                    if (altitude != null){
-                        _arrayDist.add(dist);
-                        _arrayAlt.add(altitude);
-                    }
                     
                     var dt = time-_lastTime; 
                     _sumSpeed += v*dt;
@@ -141,27 +141,37 @@ class HRIndexView extends Ui.SimpleDataField {
                         _arraySpeed = _arraySpeed.slice(1, _arraySpeed.size());
                     }
                     
+                    if (altitude != null){
+                        _arrayDist.add(dist);
+                        _arrayAlt.add(altitude);
+                    }
                     while (_arrayDist.size() > 2 && _arrayDist[_arrayDist.size()-1] -_arrayDist[1] > _avgDist){						
                         _arrayDist = _arrayDist.slice(1, _arrayDist.size());
                         _arrayAlt = _arrayAlt.slice(1, _arrayAlt.size());
                     }
-
+                    if (_arrayDist.size() > 1){
+                        var dist = _arrayDist[_arrayDist.size()-1] - _arrayDist[0];
+                        var elev = _arrayAlt[_arrayAlt.size()-1] - _arrayAlt[0];
+						_arrayGrad.add(dist > 1.0 ? elev/dist:0.0);
+						while (_arrayGrad.size() > _arrayDist.size()){
+                        	_arrayGrad = _arrayGrad.slice(1, _arrayGrad.size());
+						}
+                    }    	
+                    if (_arrayGrad.size() > 0){
+                    	for (var i=0;i<_arrayGrad.size();i++){
+                    		grad += _arrayGrad[i];
+                    	}
+                    	grad /= _arrayGrad.size();
+                    }
+										
                     var f = 1.0;
                     if (_elevMode > 0){
-                        if (_arrayDist.size() > 1){
-                            var dist = _arrayDist[_arrayDist.size()-1] - _arrayDist[0];
-                            var elev = _arrayAlt[_arrayAlt.size()-1] - _arrayAlt[0];
-                            if (dist > 1.0){
-                                if (_elevMode == 2){
-                                    if (dist > 0.5 * _avgDist){
-                                        f = minettiBounded(elev/dist)/_minettiZero;
-                                    }		
-                                }
-                                else if (elev > 0){
-                                    f = (dist + 6.0 * elev)/dist;
-                                }							
-                            }
+                        if (_elevMode == 2){
+                            f = minettiBounded(grad)/_minettiZero;
                         }
+                        else if (elev > 0){
+                            f = 1.0 + 6.0*grad;
+                        }	
                     }
 										
                     _lastTime =  time;
@@ -169,6 +179,7 @@ class HRIndexView extends Ui.SimpleDataField {
                 }
                 
 		        _fitHri.setData(_lastHRI);				
+		        _fitGrad.setData(grad);				
                	return  _lastHRI.format("%.0f");                
             } 
         }
