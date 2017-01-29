@@ -46,6 +46,7 @@ class HRIndexView extends Ui.SimpleDataField {
     hidden var _sumTime;
     hidden var _lastTime;
     hidden var _lastHRI;
+    hidden var _lastGrad;
     hidden var _minettiZero;
     hidden var _minettiMinX;
     hidden var _minettiMinA;
@@ -82,6 +83,7 @@ class HRIndexView extends Ui.SimpleDataField {
         _sumSpeed = 0.0f;
         _sumTime = 0.0f;
         _lastTime = 0.0f;
+        _lastGrad = 0.0f;
         _lastHRI = -1.0f;		
         _minettiZero = minetti(0.0);
     	_minettiMinX = -0.45f;
@@ -126,7 +128,6 @@ class HRIndexView extends Ui.SimpleDataField {
                     _arrayAlt.add(altitude);
                 }
 				
-                var grad = 0.0;
                 if (_lastTime < time){
                     
                     var dt = time-_lastTime; 
@@ -158,19 +159,20 @@ class HRIndexView extends Ui.SimpleDataField {
 						}
                     }    	
                     if (_arrayGrad.size() > 0){
+                        _lastGrad = 0.0;
                     	for (var i=0;i<_arrayGrad.size();i++){
-                    		grad += _arrayGrad[i];
+                    		_lastGrad += _arrayGrad[i];
                     	}
-                    	grad /= _arrayGrad.size();
+                    	_lastGrad /= _arrayGrad.size();
                     }
 										
                     var f = 1.0;
                     if (_elevMode > 0){
                         if (_elevMode == 2){
-                            f = minettiBounded(grad)/_minettiZero;
+                            f = minettiBounded(_lastGrad)/_minettiZero;
                         }
                         else if (elev > 0){
-                            f = 1.0 + 6.0*grad;
+                            f = 1.0 + 6.0*_lastGrad;
                         }	
                     }
 										
@@ -179,7 +181,7 @@ class HRIndexView extends Ui.SimpleDataField {
                 }
                 
 		        _fitHri.setData(_lastHRI);				
-		        _fitGrad.setData(grad);				
+		        _fitGrad.setData(_lastGrad);
                	return  _lastHRI.format("%.0f");                
             } 
         }
