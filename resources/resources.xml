@@ -1,7 +1,7 @@
 <resources>
 
 <properties>
-    <property id="appVersion" type="string">1.3.3</property>
+    <property id="appVersion" type="string">1.3.4</property>
     <property id="shr" type="number">60</property>
     <property id="avgTime" type="number">20</property>
     <property id="avgDist" type="number">75</property>

@@ -93,7 +93,7 @@ class HRIndexView extends Ui.SimpleDataField {
       	_minettiMaxA = minettiDiv(_minettiMaxX);
       	_minettiMaxB = minetti(_minettiMaxX);
         _fitHri = createField("hrIndex", 0, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD });
-        _fitGrad = createField("gradient", 1, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD , :units=>"m/m"});
+        _fitGrad = createField("mgradient", 1, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD , :units=>"m/m"});
     }
 
     function compute(info) { 
