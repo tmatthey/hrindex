@@ -1,18 +1,18 @@
 <resources>
 
 <properties>
-    <property id="appVersion" type="string">1.3.5</property>
+    <property id="appVersion" type="string">1.4.0</property>
     <property id="shr" type="number">60</property>
     <property id="avgTime" type="number">20</property>
     <property id="avgDist" type="number">75</property>
     <property id="elevMode" type="number">2</property>
+    <property id="gradFact" type="float">0.8</property>
 </properties>
 
 	<strings>
 		<string id="AppVersionTitle">Heart Rate Index</string>
 		<string id="SHRLabel">Standing Heart Rate [HRB]</string>
-		<string id="SHRPrompt">Enter standing heart rate, ca. rest heart
-		rate - 12</string>
+		<string id="SHRPrompt">Enter standing heart rate, ca. rest heart rate - 12</string>
 		<string id="SHRError">HRB shall be 30 - 200.</string>
 		<string id="AvgTimeLabel">Averaging time of pace [s]</string>
 		<string id="AvgTimeError">Averaging time shall be 1-600[s]</string>
@@ -27,6 +27,9 @@
 		<string id="gradTitle">Gradient</string>
 		<string id="grad">Gradient</string>
 		<string id="dataAvgLabel">Average HR Index</string>
+		<string id="gradFactLabel">Gradient averaging factor</string>
+		<string id="gradFactPrompt">Defines the weighting of past gradients. 0 for last gradient, 1.0 mean gradients</string>
+		<string id="gradFactError">Valid range 0.0-1.0</string>
 	</strings>
 
 <settings>
@@ -45,6 +48,10 @@
     
     <setting propertyKey="@Properties.avgDist" title="@Strings.AvgDistLabel" >
         <settingConfig type="numeric" errorMessage="@Strings.AvgDistError" min="1" max="1000"/>
+    </setting>
+
+    <setting propertyKey="@Properties.gradFact" title="@Strings.gradFactLabel" prompt="@Strings.gradFactPrompt">
+        <settingConfig type="numeric" errorMessage="@Strings.gradFactError" min="0" max="1"/>
     </setting>
 
     <setting propertyKey="@Properties.elevMode" title="@Strings.ElevModeLabel" prompt="@Strings.ElevModePrompt">

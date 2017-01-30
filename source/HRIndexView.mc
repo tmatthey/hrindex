@@ -49,6 +49,7 @@ class HRIndexView extends Ui.SimpleDataField {
     hidden var _lastTime;
     hidden var _lastHRI;
     hidden var _lastGrad;
+    hidden var _gradFact;
     hidden var _minettiZero;
     hidden var _minettiMinX;
     hidden var _minettiMinA;
@@ -67,6 +68,7 @@ class HRIndexView extends Ui.SimpleDataField {
         _avgTime = Application.getApp().getProperty("avgTime");
         _avgDist = Application.getApp().getProperty("avgDist");
         _elevMode = Application.getApp().getProperty("elevMode");
+        _gradFact = Application.getApp().getProperty("gradFact");
  
         var e = "";
         if (_elevMode == 1){
@@ -166,10 +168,14 @@ class HRIndexView extends Ui.SimpleDataField {
                     }    	
                     if (_arrayGrad.size() > 0){
                         _lastGrad = 0.0;
+                        var sum = 0.0;
+                        var f = 1.0;
                     	for (var i=0;i<_arrayGrad.size();i++){
-                    		_lastGrad += _arrayGrad[i];
+                    		_lastGrad += _arrayGrad[_arrayGrad.size()-1-i]*f;
+                    		sum += f;
+                    		f *= _gradFact;
                     	}
-                    	_lastGrad /= _arrayGrad.size();
+                    	_lastGrad /= sum;
                     }
 										
                     var f = 1.0;
@@ -190,6 +196,7 @@ class HRIndexView extends Ui.SimpleDataField {
                 }
 		        _fitHri.setData(_lastHRI);				
 		        _fitGrad.setData(_lastGrad);
+ 								
                	return  _lastHRI.format("%.0f");                
             } 
         }
