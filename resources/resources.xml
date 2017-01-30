@@ -1,7 +1,7 @@
 <resources>
 
 <properties>
-    <property id="appVersion" type="string">1.3.4</property>
+    <property id="appVersion" type="string">1.3.5</property>
     <property id="shr" type="number">60</property>
     <property id="avgTime" type="number">20</property>
     <property id="avgDist" type="number">75</property>
@@ -26,6 +26,7 @@
 		<string id="index">Index</string>
 		<string id="gradTitle">Gradient</string>
 		<string id="grad">Gradient</string>
+		<string id="dataAvgLabel">Average HR Index</string>
 	</strings>
 
 <settings>
@@ -56,7 +57,7 @@
 
 </settings>
 
-    <fitContributions>
+   <fitContributions>
         <fitField id="0"
         displayInChart="true"
         sortOrder="0"
@@ -67,8 +68,16 @@
         fillColor="#FF0000" />
         
         <fitField id="1"
+        displayInActivitySummary="true"
+        sortOrder = "1"
+        precision="2"
+        displayInActivityLaps="true"
+        dataLabel="@Strings.dataAvgLabel"
+        unitLabel="@Strings.index" />
+
+        <fitField id="2"
         displayInChart="true"
-        sortOrder="0"
+        sortOrder="2"
         precision="2"
         chartTitle="@Strings.gradTitle"
         dataLabel="@Strings.gradTitle"

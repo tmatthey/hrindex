@@ -44,6 +44,8 @@ class HRIndexView extends Ui.SimpleDataField {
     hidden var _arrayGrad;
     hidden var _sumSpeed;
     hidden var _sumTime;
+    hidden var _sumHRIndex;
+    hidden var _sumHRIndexDt;
     hidden var _lastTime;
     hidden var _lastHRI;
     hidden var _lastGrad;
@@ -55,6 +57,7 @@ class HRIndexView extends Ui.SimpleDataField {
     hidden var _minettiMaxA;
     hidden var _minettiMaxB;
 	hidden var _fitHri;
+	hidden var _fitHRIndexAvg;
 	hidden var _fitGrad;
 
     function initialize() {
@@ -84,6 +87,8 @@ class HRIndexView extends Ui.SimpleDataField {
         _sumTime = 0.0f;
         _lastTime = 0.0f;
         _lastGrad = 0.0f;
+        _sumHRIndex = 0.0f;
+        _sumHRIndexDt = 0.0f;
         _lastHRI = -1.0f;		
         _minettiZero = minetti(0.0);
     	_minettiMinX = -0.45f;
@@ -93,7 +98,8 @@ class HRIndexView extends Ui.SimpleDataField {
       	_minettiMaxA = minettiDiv(_minettiMaxX);
       	_minettiMaxB = minetti(_minettiMaxX);
         _fitHri = createField("hrIndex", 0, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD });
-        _fitGrad = createField("mgradient", 1, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD , :units=>"m/m"});
+        _fitHRIndexAvg = createField("runHRIndexAvg", 1, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_SESSION, :units=>"w" });
+        _fitGrad = createField("mgradient", 2, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD , :units=>"m/m"});
     }
 
     function compute(info) { 
@@ -178,8 +184,10 @@ class HRIndexView extends Ui.SimpleDataField {
 										
                     _lastTime =  time;
                     _lastHRI = hr / (_sumSpeed / _sumTime) / f;
+                    _sumHRIndex += _lastHRI*dt;
+                    _sumHRIndexDt += dt;
+		        	_fitHRIndexAvg.setData(_sumHRIndex/_sumHRIndexDt);
                 }
-                
 		        _fitHri.setData(_lastHRI);				
 		        _fitGrad.setData(_lastGrad);
                	return  _lastHRI.format("%.0f");                
