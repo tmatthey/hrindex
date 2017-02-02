@@ -102,6 +102,7 @@ class HRIndexView extends Ui.SimpleDataField {
         _fitHri = createField("hrIndex", 0, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD });
         _fitHRIndexAvg = createField("runHRIndexAvg", 1, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_SESSION, :units=>"w" });
         _fitGrad = createField("mgradient", 2, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD , :units=>"m/m"});
+        _fitHRIndexAvg.setData(0.0f);
     }
 
     function compute(info) { 

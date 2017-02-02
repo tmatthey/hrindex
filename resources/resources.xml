@@ -1,7 +1,7 @@
 <resources>
 
 <properties>
-    <property id="appVersion" type="string">1.4.0</property>
+    <property id="appVersion" type="string">1.4.1</property>
     <property id="shr" type="number">60</property>
     <property id="avgTime" type="number">20</property>
     <property id="avgDist" type="number">75</property>
@@ -14,22 +14,24 @@
 		<string id="SHRLabel">Standing Heart Rate [HRB]</string>
 		<string id="SHRPrompt">Enter standing heart rate, ca. rest heart rate - 12</string>
 		<string id="SHRError">HRB shall be 30 - 200.</string>
-		<string id="AvgTimeLabel">Averaging time of pace [s]</string>
+		<string id="AvgTimeLabel">Averaging time interval of pace [s]</string>
 		<string id="AvgTimeError">Averaging time shall be 1-600[s]</string>
-		<string id="AvgDistLabel">Averaging distance for gradient [m]</string>
-		<string id="AvgDistError">Averaging distance shall be 1-1000[m]</string>
+		<string id="AvgTimePrompt">>The time interval of paces to be averaged. Shorter time will give more updates, but with a greater chance of variation.</string>
+		<string id="AvgDistLabel">Distance frequency [m]</string>
+		<string id="AvgDistError">Averaging distance shall be 5-1000[m]</string>
+		<string id="AvgDistPrompt">The distance for the grade to be calculated. Shorter distances will give more updates, but with a greater chance of variation.</string>
+		<string id="gradTitle">Gradient</string>
+		<string id="grad">Gradient</string>
+		<string id="gradFactLabel">Gradient averaging factor</string>
+		<string id="gradFactPrompt">Defines the weighting of past gradients. 0 for last gradient, 1.0 mean gradients</string>
+		<string id="gradFactError">Valid range 0.0-1.0</string>
 		<string id="ElevModeLabel">Elevation model</string>
 		<string id="ElevModePrompt">Model to account uphill and downhill. Grade Adjusted Pace (GAP) estimates the equivalent flat land pace for a given running pace on hilly terrain.</string>
 		<string id="ElevNone">None</string>
 		<string id="Elev6">Constant 6x uphill</string>
 		<string id="ElevMinetti">GAP: Minetti et. al.</string>
 		<string id="index">Index</string>
-		<string id="gradTitle">Gradient</string>
-		<string id="grad">Gradient</string>
 		<string id="dataAvgLabel">Average HR Index</string>
-		<string id="gradFactLabel">Gradient averaging factor</string>
-		<string id="gradFactPrompt">Defines the weighting of past gradients. 0 for last gradient, 1.0 mean gradients</string>
-		<string id="gradFactError">Valid range 0.0-1.0</string>
 	</strings>
 
 <settings>
@@ -42,12 +44,12 @@
         <settingConfig type="numeric" errorMessage="@Strings.SHRError" min="30" max="200"/>
     </setting>
 
-    <setting propertyKey="@Properties.avgTime" title="@Strings.AvgTimeLabel" >
+    <setting propertyKey="@Properties.avgTime" title="@Strings.AvgTimeLabel" prompt="@Strings.AvgTimePrompt">
         <settingConfig type="numeric" errorMessage="@Strings.AvgTimeError" min="1" max="600"/>
     </setting>
     
-    <setting propertyKey="@Properties.avgDist" title="@Strings.AvgDistLabel" >
-        <settingConfig type="numeric" errorMessage="@Strings.AvgDistError" min="1" max="1000"/>
+    <setting propertyKey="@Properties.avgDist" title="@Strings.AvgDistLabel" prompt="@Strings.AvgDistPrompt">
+        <settingConfig type="numeric" errorMessage="@Strings.AvgDistError" min="5" max="1000"/>
     </setting>
 
     <setting propertyKey="@Properties.gradFact" title="@Strings.gradFactLabel" prompt="@Strings.gradFactPrompt">
