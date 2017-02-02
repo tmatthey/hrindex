@@ -1,7 +1,7 @@
 <resources>
 
 <properties>
-    <property id="appVersion" type="string">1.4.1</property>
+    <property id="appVersion" type="string">1.4.2</property>
     <property id="shr" type="number">60</property>
     <property id="avgTime" type="number">20</property>
     <property id="avgDist" type="number">75</property>
@@ -16,7 +16,7 @@
 		<string id="SHRError">HRB shall be 30 - 200.</string>
 		<string id="AvgTimeLabel">Averaging time interval of pace [s]</string>
 		<string id="AvgTimeError">Averaging time shall be 1-600[s]</string>
-		<string id="AvgTimePrompt">>The time interval of paces to be averaged. Shorter time will give more updates, but with a greater chance of variation.</string>
+		<string id="AvgTimePrompt">The time interval of paces to be averaged. Shorter time will give more updates, but with a greater chance of variation.</string>
 		<string id="AvgDistLabel">Distance frequency [m]</string>
 		<string id="AvgDistError">Averaging distance shall be 5-1000[m]</string>
 		<string id="AvgDistPrompt">The distance for the grade to be calculated. Shorter distances will give more updates, but with a greater chance of variation.</string>
