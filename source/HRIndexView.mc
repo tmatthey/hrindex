@@ -44,6 +44,8 @@ class HRIndexView extends Ui.SimpleDataField {
     hidden var _arrayGrad;
     hidden var _sumSpeed;
     hidden var _sumTime;
+    hidden var _lapHRIndexDt;
+    hidden var _lapHRIndex;
     hidden var _sumHRIndex;
     hidden var _sumHRIndexDt;
     hidden var _lastTime;
@@ -57,18 +59,19 @@ class HRIndexView extends Ui.SimpleDataField {
     hidden var _minettiMaxX;
     hidden var _minettiMaxA;
     hidden var _minettiMaxB;
-	hidden var _fitHri;
-	hidden var _fitHRIndexAvg;
-	hidden var _fitGrad;
+    hidden var _fitHri;
+    hidden var _fitHRIndexAvg;
+    hidden var _fitHRIndexLap;
+    hidden var _fitGrad;
 
     function initialize() {
         SimpleDataField.initialize();
  
-        _SHR = Application.getApp().getProperty("shr");
-        _avgTime = Application.getApp().getProperty("avgTime");
-        _avgDist = Application.getApp().getProperty("avgDist");
+        _SHR = getFloatProperty("shr", 60.0f);
+        _avgTime = getFloatProperty("avgTime", 20.0f);
+        _avgDist = getFloatProperty("avgDist", 75.0f);
         _elevMode = Application.getApp().getProperty("elevMode");
-        _gradFact = Application.getApp().getProperty("gradFact");
+        _gradFact = getFloatProperty("gradFact", 0.8f);
  
         var e = "";
         if (_elevMode == 1){
@@ -85,24 +88,28 @@ class HRIndexView extends Ui.SimpleDataField {
         _arrayDist = new [0];
         _arrayAlt = new [0];
         _arrayGrad = new [0];
+        _lapHRIndexDt = 0.0f;
+        _lapHRIndex = 0.0f;
         _sumSpeed = 0.0f;
         _sumTime = 0.0f;
         _lastTime = 0.0f;
         _lastGrad = 0.0f;
         _sumHRIndex = 0.0f;
         _sumHRIndexDt = 0.0f;
-        _lastHRI = -1.0f;		
+        _lastHRI = -1.0f;        
         _minettiZero = minetti(0.0);
-    	_minettiMinX = -0.45f;
-      	_minettiMinA = minettiDiv(_minettiMinX);
-      	_minettiMinB = minetti(_minettiMinX);
-      	_minettiMaxX = 0.45f;
-      	_minettiMaxA = minettiDiv(_minettiMaxX);
-      	_minettiMaxB = minetti(_minettiMaxX);
+        _minettiMinX = -0.45f;
+        _minettiMinA = minettiDiv(_minettiMinX);
+        _minettiMinB = minetti(_minettiMinX);
+        _minettiMaxX = 0.45f;
+        _minettiMaxA = minettiDiv(_minettiMaxX);
+        _minettiMaxB = minetti(_minettiMaxX);
         _fitHri = createField("hrIndex", 0, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD });
         _fitHRIndexAvg = createField("runHRIndexAvg", 1, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_SESSION, :units=>"w" });
-        _fitGrad = createField("mgradient", 2, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD , :units=>"m/m"});
+        _fitHRIndexLap = createField("runHRIndexLap", 2, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_LAP, :units=>"w" });
+        _fitGrad = createField("runHRIndexGradient", 3, Fit.DATA_TYPE_FLOAT, { :mesgType=>Fit.MESG_TYPE_RECORD , :units=>"%"});
         _fitHRIndexAvg.setData(0.0f);
+        _fitHRIndexLap.setData(0.0f);
     }
 
     function compute(info) { 
@@ -127,16 +134,16 @@ class HRIndexView extends Ui.SimpleDataField {
                 var altitude = null;
                 var dist = null;                
                 if (info has :elapsedDistance && act has :altitude ){
-                	if (info.elapsedDistance != null && act.altitude != null){
-                		altitude = act.altitude;
-                		dist = info.elapsedDistance;
-                	}
+                    if (info.elapsedDistance != null && act.altitude != null){
+                        altitude = act.altitude;
+                        dist = info.elapsedDistance;
+                    }
                 }
                 if (altitude != null && _arrayDist.size() == 0){
                     _arrayDist.add(dist);
                     _arrayAlt.add(altitude);
                 }
-				
+                
                 if (_lastTime < time){
                     
                     var dt = time-_lastTime; 
@@ -155,30 +162,30 @@ class HRIndexView extends Ui.SimpleDataField {
                         _arrayDist.add(dist);
                         _arrayAlt.add(altitude);
                     }
-                    while (_arrayDist.size() > 2 && _arrayDist[_arrayDist.size()-1] -_arrayDist[1] > _avgDist){						
+                    while (_arrayDist.size() > 2 && _arrayDist[_arrayDist.size()-1] -_arrayDist[1] > _avgDist){                        
                         _arrayDist = _arrayDist.slice(1, _arrayDist.size());
                         _arrayAlt = _arrayAlt.slice(1, _arrayAlt.size());
                     }
                     if (_arrayDist.size() > 1){
                         var dist = _arrayDist[_arrayDist.size()-1] - _arrayDist[0];
                         var elev = _arrayAlt[_arrayAlt.size()-1] - _arrayAlt[0];
-						_arrayGrad.add(dist > 1.0 ? elev/dist:0.0);
-						while (_arrayGrad.size() > _arrayDist.size()){
-                        	_arrayGrad = _arrayGrad.slice(1, _arrayGrad.size());
-						}
-                    }    	
+                        _arrayGrad.add(dist > 1.0 && time > _avgTime ? elev/dist:0.0);
+                        while (_arrayGrad.size() > _arrayDist.size()){
+                            _arrayGrad = _arrayGrad.slice(1, _arrayGrad.size());
+                        }
+                    }        
                     if (_arrayGrad.size() > 0){
                         _lastGrad = 0.0;
                         var sum = 0.0;
                         var f = 1.0;
-                    	for (var i=0;i<_arrayGrad.size();i++){
-                    		_lastGrad += _arrayGrad[_arrayGrad.size()-1-i]*f;
-                    		sum += f;
-                    		f *= _gradFact;
-                    	}
-                    	_lastGrad /= sum;
+                        for (var i=0;i<_arrayGrad.size();i++){
+                            _lastGrad += _arrayGrad[_arrayGrad.size()-1-i]*f;
+                            sum += f;
+                            f *= _gradFact;
+                        }
+                        _lastGrad /= sum;
                     }
-										
+                                        
                     var f = 1.0;
                     if (_elevMode > 0){
                         if (_elevMode == 2){
@@ -186,31 +193,39 @@ class HRIndexView extends Ui.SimpleDataField {
                         }
                         else if (elev > 0){
                             f = 1.0 + 6.0*_lastGrad;
-                        }	
+                        }    
                     }
-										
+                                        
                     _lastTime =  time;
                     _lastHRI = hr / (_sumSpeed / _sumTime) / f;
                     _sumHRIndex += _lastHRI*dt;
                     _sumHRIndexDt += dt;
-		        	_fitHRIndexAvg.setData(_sumHRIndex/_sumHRIndexDt);
+                    _lapHRIndex += _lastHRI*dt;
+                    _lapHRIndexDt += dt;
+                    _fitHRIndexAvg.setData((_sumHRIndex/_sumHRIndexDt).toFloat());
+                    _fitHRIndexLap.setData((_lapHRIndex/_lapHRIndexDt).toFloat());
                 }
-		        _fitHri.setData(_lastHRI);				
-		        _fitGrad.setData(_lastGrad);
- 								
-               	return  _lastHRI.format("%.0f");                
+                _fitHri.setData(_lastHRI);                
+                _fitGrad.setData(_lastGrad*100);
+                                 
+                   return  _lastHRI.format("%.0f");                
             } 
         }
         return "-";
     }
     
+    function onTimerLap() {
+        _lapHRIndexDt = 0.0f;
+        _lapHRIndex = 0.0f;
+    }
+       
     function minettiBounded(g){
-    	if (g <= _minettiMinX){
-    		return _minettiMinA * (g - _minettiMinX) + _minettiMinB;
-    	}
-    	if (_minettiMaxX <= g){
-    		return _minettiMaxA * (g - _minettiMaxX) + _minettiMaxB;
-    	}
+        if (g <= _minettiMinX){
+            return _minettiMinA * (g - _minettiMinX) + _minettiMinB;
+        }
+        if (_minettiMaxX <= g){
+            return _minettiMaxA * (g - _minettiMaxX) + _minettiMaxB;
+        }
         return minetti(g);
     }
     
@@ -221,5 +236,25 @@ class HRIndexView extends Ui.SimpleDataField {
     
     function minettiDiv(g){
         return 106.7731478*g*g*g*g*5.0 - 47.23550515*g*g*g*4.0 - 33.40634794*g*g*3.0 + 49.35038999*g*2.0 + 19.12318478;
+    }
+    
+    // https://forums.garmin.com/forum/developers/connect-iq/122198-
+    function getFloatProperty(key, initial) {
+        var value = Application.getApp().getProperty(key);
+        if (value != null) {
+
+            if (value instanceof Lang.String ||
+                     value instanceof Lang.Double ||
+                     value instanceof Lang.Long ||
+                     value instanceof Lang.Number||
+                     value instanceof Lang.Float) {
+                return value;
+            }
+            else if (value instanceof Lang.Boolean) {
+                return value ? 1.0f : 0.0f;
+            }
+        }
+
+        return initial;
     }
 }

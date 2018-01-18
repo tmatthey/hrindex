@@ -1,7 +1,7 @@
 <resources>
 
 <properties>
-    <property id="appVersion" type="string">1.4.3</property>
+    <property id="appVersion" type="string">2.2.0</property>
     <property id="shr" type="number">60</property>
     <property id="avgTime" type="number">20</property>
     <property id="avgDist" type="number">75</property>
@@ -80,11 +80,18 @@
         displayInActivitySummary="true"
         sortOrder = "1"
         precision="2"
-        displayInActivityLaps="true"
         dataLabel="@Strings.dataAvgLabel"
         unitLabel="@Strings.index" />
 
         <fitField id="2"
+        displayInChart="false"
+        sortOrder="2"
+        precision="2"
+        displayInActivityLaps="true"
+        dataLabel="@Strings.dataAvgLabel"
+        unitLabel="@Strings.index" />
+        
+        <fitField id="3"
         displayInChart="true"
         sortOrder="2"
         precision="2"
