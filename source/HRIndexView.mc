@@ -168,7 +168,7 @@ class HRIndexView extends Ui.SimpleDataField {
                     }
                     var elev = 0.0;
                     if (_arrayDist.size() > 1){
-                        var dist = _arrayDist[_arrayDist.size()-1] - _arrayDist[0];
+                        dist = _arrayDist[_arrayDist.size()-1] - _arrayDist[0];
                         elev = _arrayAlt[_arrayAlt.size()-1] - _arrayAlt[0];
                         _arrayGrad.add(dist > 1.0 && time > _avgTime ? elev/dist:0.0);
                         while (_arrayGrad.size() > _arrayDist.size()){
